@@ -1,9 +1,10 @@
 import { isLocationAction } from 'redux-first-router';
 import { combineReducers } from 'berkeleys-redux-utils';
 
-import profileReducer from './Profile/redux';
+
+import challengeReducer from './Challenges/redux';
 import settingsReducer from './Settings/redux';
-import { routes as profileRoutes } from './Profile';
+import { routes as challengeRoutes } from './Challenges';
 import { routes as settingsRoutes } from './Settings';
 
 const ns = 'mainRouter';
@@ -15,11 +16,11 @@ export function mainRouter(state = 'NotFound', action) {
     return state;
   }
   const { type } = action;
+  if (challengeRoutes[type]) {
+    return 'challenges';
+  }
   if (settingsRoutes[type]) {
     return 'settings';
-  }
-  if (profileRoutes[type]) {
-    return 'profile';
   }
   return '';
 }
@@ -27,7 +28,7 @@ export function mainRouter(state = 'NotFound', action) {
 mainRouter.toString = () => ns;
 
 export default combineReducers(
-  profileReducer,
+  challengeReducer,
   settingsReducer,
   mainRouter
 );

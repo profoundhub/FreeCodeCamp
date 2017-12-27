@@ -1,27 +1,24 @@
 import {
   createAction,
-  createAsyncTypes,
   createTypes,
   handleActions
 } from 'berkeleys-redux-utils';
 import { createSelector } from 'reselect';
-import { capitalize, noop } from 'lodash';
+import noop from 'lodash/noop';
+import capitalize from 'lodash/capitalize';
 
 import * as utils from './utils.js';
+import ns from '../ns.json';
 import {
+  types as app,
   createEventMetaCreator
 } from '../../redux';
 
-import fetchMapUiEpic from './fetch-map-ui-epic';
-
-const ns = 'map';
-
-export const epics = [ fetchMapUiEpic ];
+export const epics = [];
 
 export const types = createTypes([
   'onRouteMap',
   'initMap',
-  createAsyncTypes('fetchMapUi'),
   'toggleThisPanel',
 
   'isAllCollapsed',
@@ -32,9 +29,6 @@ export const types = createTypes([
 ], ns);
 
 export const initMap = createAction(types.initMap);
-
-export const fetchMapUi = createAction(types.fetchMapUi.start);
-export const fetchMapUiComplete = createAction(types.fetchMapUi.complete);
 
 export const toggleThisPanel = createAction(types.toggleThisPanel);
 export const collapseAll = createAction(types.collapseAll);
@@ -68,15 +62,27 @@ export function makePanelOpenSelector(name) {
   );
 }
 
+export function makePanelHiddenSelector(name) {
+  return createSelector(
+    mapSelector,
+    mapUi => {
+      const node = utils.getNode(mapUi, name);
+      return node ? node.isHidden : false;
+    }
+  );
+}
 // interface Map{
 //   children: [...{
 //     name: (superBlock: String),
 //     isOpen: Boolean,
+//     isHidden: Boolean,
 //     children: [...{
 //       name: (blockName: String),
 //       isOpen: Boolean,
+//       isHidden: Boolean,
 //       children: [...{
 //         name: (challengeName: String),
+//         isHidden: Boolean
 //       }]
 //     }]
 //   }
@@ -105,17 +111,14 @@ export default handleActions(
         mapUi
       };
     },
-    [types.fetchMapUi.complete]: (state, { payload }) => {
-      const { entities, result, initialNode } = payload;
-      const mapUi = utils.createMapUi(entities, result);
+    [app.fetchChallenges.complete]: (state, { payload }) => {
+      const { entities, result } = payload;
       return {
         ...state,
-        ...result,
-        mapUi: utils.openPath(mapUi, initialNode)
+        mapUi: utils.createMapUi(entities, result)
       };
     }
   }),
   initialState,
   ns
 );
-

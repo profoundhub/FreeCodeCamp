@@ -5,16 +5,18 @@ import { createSelector } from 'reselect';
 
 import toUrl from './to-url.js';
 import createHandler from './handle-press.js';
-import { routesMapSelector } from './redux';
+import { routesMapSelector, langSelector } from './redux';
 
 const mapStateToProps = createSelector(
+  langSelector,
   routesMapSelector,
-  routesMap => ({ routesMap })
+  (lang, routesMap) => ({ lang, routesMap })
 );
 
 const propTypes = {
   children: PropTypes.node,
   dispatch: PropTypes.func,
+  lang: PropTypes.string,
   onClick: PropTypes.func,
   redirect: PropTypes.bool,
   replace: PropTypes.bool,
@@ -29,6 +31,7 @@ export const Link = (
   {
     children,
     dispatch,
+    lang,
     onClick,
     redirect,
     replace,
@@ -39,7 +42,7 @@ export const Link = (
     to
   }
 ) => {
-  const url = toUrl(to, routesMap);
+  const url = toUrl(to, routesMap, lang);
   const handler = createHandler(
     url,
     routesMap,

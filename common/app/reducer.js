@@ -1,15 +1,18 @@
 import { combineReducers } from 'berkeleys-redux-utils';
+import { reducer as formReducer } from 'redux-form';
 
 import app from './redux';
 import entities from './entities';
-import { reducer as form } from 'redux-form';
 import map from './Map/redux';
 import nav from './Nav/redux';
 import routes from './routes/redux';
 import toasts from './Toasts/redux';
-import flash from './Flash/redux';
+import files from './files';
+// not ideal but should go away once we move to react-redux-form
+import { projectNormalizer } from './routes/Challenges/redux';
 
-form.toString = () => 'form';
+const _formReducer = formReducer.normalize({ ...projectNormalizer });
+_formReducer.toString = () => 'form';
 
 export default combineReducers(
   app,
@@ -18,6 +21,6 @@ export default combineReducers(
   nav,
   routes,
   toasts,
-  flash,
-  form
+  files,
+  _formReducer
 );

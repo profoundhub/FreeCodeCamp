@@ -6,10 +6,15 @@ import {
   handleActions
 } from 'berkeleys-redux-utils';
 
+import loadCurrentChallengeEpic from './load-current-challenge-epic.js';
+import binEpic from './bin-epic.js';
 import ns from '../ns.json';
-import { createEventMetaCreator } from '../../analytics/index';
+import { createEventMetaCreator } from '../../redux';
 
-export const epics = [];
+export const epics = [
+  loadCurrentChallengeEpic,
+  binEpic
+];
 
 export const types = createTypes([
   'clickOnLogo',

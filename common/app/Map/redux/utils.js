@@ -157,6 +157,7 @@ export function collapseAllPanels(tree) {
 export function expandAllPanels(tree) {
   return toggleAllPanels(tree, true);
 }
+<<<<<<< HEAD
 
 // synchronise
 // updatePath(
@@ -229,3 +230,5 @@ export function openPath(tree, name) {
 }
 
 
+=======
+>>>>>>> add Common
