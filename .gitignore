@@ -58,3 +58,6 @@ public/css/main*
 webpack-bundle-stats.html
 server/rev-manifest.json
 google-credentials.json
+
+*.lock
+yarn.lock
