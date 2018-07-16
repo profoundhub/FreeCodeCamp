@@ -1,7 +1,9 @@
 import helmet from 'helmet';
 
 let trusted = [
-  "'self'"
+  "'self'",
+  'https://search.freecodecamp.org',
+  'https://*.algolianet.com'
 ];
 
 const host = process.env.HOST || 'localhost';
@@ -9,8 +11,7 @@ const port = process.env.SYNC_PORT || '3000';
 
 if (process.env.NODE_ENV !== 'production') {
   trusted = trusted.concat([
-    `ws://${host}:${port}`,
-    'https://search.freecodecamp.org'
+    `ws://${host}:${port}`
   ]);
 }
 
