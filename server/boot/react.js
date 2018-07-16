@@ -17,16 +17,17 @@ const isDev = process.env.NODE_ENV !== 'production';
 // add routes here as they slowly get reactified
 // remove their individual controllers
 const routes = [
-  '/challenges',
-  '/challenges/*',
-  '/map',
   '/settings',
-  '/settings/*'
+  '/settings/*',
+  '/portfolio/:username'
 ];
 
 const devRoutes = [];
 
 const middlewares = isDev ? [errorThrowerMiddleware] : [];
+
+const markupMap = {};
+
 export default function reactSubRouter(app) {
   var router = app.loopback.Router();
 
@@ -47,19 +48,26 @@ export default function reactSubRouter(app) {
     });
   }
 
-  app.use('/:lang', router);
+  app.use(router);
 
   function serveReactApp(req, res, next) {
-    const { lang } = req;
     const serviceOptions = { req };
-    createApp({
+    if (req.originalUrl in markupMap) {
+      log('sending markup from cache');
+      const { state, title, markup } = markupMap[req.originalUrl];
+      res.expose(state, 'data', { isJSON: true });
+      // note(berks): we render without express-flash dumping our messages
+      // the app will query for these on load
+      return res.renderWithoutFlash('layout-react', { markup, title });
+    }
+    return createApp({
       serviceOptions,
       middlewares,
       enhancers: [
         devtoolsEnhancer({ name: 'server' })
       ],
       history: createMemoryHistory({ initialEntries: [ req.originalUrl ] }),
-      defaultStaet: { app: { lang } }
+      defaultState: {}
     })
       .filter(({
         location: {
@@ -95,8 +103,10 @@ export default function reactSubRouter(app) {
         const title = titleSelector(state);
         epic.dispose();
         res.expose(state, 'data', { isJSON: true });
-        res.expose(req.flash(), 'flash', { isJSON: true });
-        res.render('layout-react', { markup, title });
+        // note(berks): we render without express-flash dumping our messages
+        // the app will query for these on load
+        res.renderWithoutFlash('layout-react', { markup, title });
+        markupMap[req.originalUrl] = { markup, state, title };
       })
       .subscribe(() => log('html rendered and sent'), next);
   }
